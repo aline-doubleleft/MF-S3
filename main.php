@@ -16,7 +16,7 @@ function mfs3_after_upload($file) {
 
   if (!$s3_options) $s3_options = get_option('tantan_wordpress_s3');
 
-	  $s3 = new TanTanS3($s3_options['key'], $s3_options['secret']);
+    $s3 = new TanTanS3($s3_options['key'], $s3_options['secret']);
     $s3->setOptions($s3_options);
 
     //getting the name of the file
