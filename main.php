@@ -23,7 +23,7 @@ function mfs3_after_upload($file) {
     preg_match('/wp\-content\/.+/',$file['tmp_name'],$match);
     $file_name = $match[0];
 
-		$s3->putObjectStream($s3_options['bucket'], $file_name, $file);
+    $s3->putObjectStream($s3_options['bucket'], $file_name, $file);
 }
 
 
