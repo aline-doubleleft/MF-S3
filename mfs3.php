@@ -8,6 +8,13 @@ Author: Magic Fields Team
 Author URI: http://magicfields.org
 Licence: GPL2
 */
+global $mfs3_prefix;
+
+if(isset($current_blog)){
+  $mfs3_prefix=$wpdb->base_prefix;
+}else{
+  $mfs3_prefix=$wpdb->prefix;
+}
 
 /**
  * Magic Fields and WPML is already installed?
@@ -36,8 +43,8 @@ function mfs3_notices() {
 //Install
 register_activation_hook(__FILE__,'mfs3_install');
 function mfs3_install(){
-  global $wpdb;
-  $table_name = $wpdb->prefix.'mfs3_images';
+  global $wpdb,$mfs3_prefix;
+  $table_name = $mfs3_prefix.'mfs3_images';
 
   $sql = "CREATE TABLE ". $table_name . " ( 
     id int NOT NULL AUTO_INCREMENT,
@@ -69,7 +76,7 @@ function mfs3_after_upload($file) {
 
 add_action('mf_before_delete_file','mfs3_before_delete');
 function mfs3_before_delete($file_name) {
-  global $wpdb;
+  global $wpdb,$mfs3_prefix;
 
   require_once(WP_PLUGIN_DIR.'/tantan-s3/wordpress-s3/lib.s3.php');
 
@@ -80,7 +87,7 @@ function mfs3_before_delete($file_name) {
 
   $file = 'wp-content/files_mf/'.$file_name;
 
-  $query = "DELETE FROM ".$wpdb->prefix."mfs3_images WHERE bucket = '".$s3_options['bucket']."' AND image_path = '".$file."'";
+  $query = "DELETE FROM ".$mfs3_prefix."mfs3_images WHERE bucket = '".$s3_options['bucket']."' AND image_path = '".$file."'";
   $wpdb->query($query);
   $s3->deleteObject($s3_options['bucket'], $file);
 }
@@ -90,7 +97,7 @@ function mfs3_before_delete($file_name) {
  */ 
 add_action('mf_presave','mfs3_save_image',10,7);
 function  mfs3_save_image($field_meta_id,$name,$group_index,$field_index,$post_id,$value_field,$writepanel_id){
-  global $wpdb,$FIELD_TYPES;
+  global $wpdb,$FIELD_TYPES,$mfs3_prefix;
 
   if($value_field == "") {
     return false;
@@ -121,13 +128,13 @@ function  mfs3_save_image($field_meta_id,$name,$group_index,$field_index,$post_i
 
   if( $type == $FIELD_TYPES['image'])  {
     //Saving in the database a reference to this image
-    $wpdb->query("INSERT INTO ".$wpdb->prefix."mfs3_images VALUES ('','".$s3_options['bucket']."','".$prefix.$value_field."')");
+    $wpdb->query("INSERT INTO ".$mfs3_prefix."mfs3_images VALUES ('','".$s3_options['bucket']."','".$prefix.$value_field."')");
   }
 }
 
 add_filter('mf_source_image', 'mfs3_source_image');
 function mfs3_source_image($image_source){
-  global $wpdb;
+  global $wpdb,$mfs3_prefix;
 
   if (!$s3_options) $s3_options = get_option('tantan_wordpress_s3');
 
@@ -136,7 +143,7 @@ function mfs3_source_image($image_source){
   $file = $match[0];
 
   //checking if the image is in the CDN
-  $query = 'SELECT COUNT(1) FROM '.$wpdb->prefix.'mfs3_images WHERE bucket = "'.$s3_options['bucket'].'" AND image_path = "'.$file.'"';
+  $query = 'SELECT COUNT(1) FROM '.$mfs3_prefix.'mfs3_images WHERE bucket = "'.$s3_options['bucket'].'" AND image_path = "'.$file.'"';
   $exists = $wpdb->get_var($query);
 
   if($exists) {
@@ -148,7 +155,7 @@ function mfs3_source_image($image_source){
 
 add_filter('mf_source_path_thumb_image', 'mfs3_source_thumb_image');
 function mfs3_source_thumb_image($params = array()){
-  global $wpdb;
+  global $wpdb,$mfs3_prefix;
   
   if (!$s3_options) $s3_options = get_option('tantan_wordpress_s3');
 
@@ -157,7 +164,7 @@ function mfs3_source_thumb_image($params = array()){
   $file = $match[0];
 
   //checking if the image is in the CDN
-  $query = 'SELECT COUNT(1) FROM '.$wpdb->prefix.'mfs3_images WHERE bucket = "'.$s3_options['bucket'].'" AND image_path = "'.$file.'"';
+  $query = 'SELECT COUNT(1) FROM '.$mfs3_prefix.'mfs3_images WHERE bucket = "'.$s3_options['bucket'].'" AND image_path = "'.$file.'"';
   $exists = $wpdb->get_var($query);
 
   if($exists) {
@@ -204,7 +211,7 @@ function before_generate_thumb($image_path){
 
 add_action('mf_save_thumb_file','mfs3_save_thumb_file');
 function mfs3_save_thumb_file($filename){
-  global $wpdb,$FIELD_TYPES;
+  global $wpdb,$FIELD_TYPES,$mfs3_prefix;
 
   if($filename == "") {
     return false;
@@ -217,11 +224,11 @@ function mfs3_save_thumb_file($filename){
   preg_match('/wp-content\/.+/',$filename,$match);
 
   $file = $match[0];
-  $exists = $wpdb->get_var("SELECT count(1) FROM ".$wpdb->prefix."mfs3_images WHERE bucket = '".$s3_options['bucket']."' AND image_path = '".$file."'");
+  $exists = $wpdb->get_var("SELECT count(1) FROM ".$mfs3_prefix."mfs3_images WHERE bucket = '".$s3_options['bucket']."' AND image_path = '".$file."'");
 
 
   if(!$exists) {
     //Saving in the database a reference to this image
-    $wpdb->query("INSERT INTO ".$wpdb->prefix."mfs3_images VALUES ('','".$s3_options['bucket']."','".$file."')");
+    $wpdb->query("INSERT INTO ".$mfs3_prefix."mfs3_images VALUES ('','".$s3_options['bucket']."','".$file."')");
   }
 }
