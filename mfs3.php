@@ -97,7 +97,7 @@ function mfs3_before_delete($file_name) {
  */ 
 add_action('mf_presave','mfs3_save_image',10,7);
 function  mfs3_save_image($field_meta_id,$name,$group_index,$field_index,$post_id,$value_field,$writepanel_id){
-  global $wpdb,$FIELD_TYPES,$mfs3_prefix;
+  global $wpdb,$FIELD_TYPES,$mfs3_prefix, $blog_id,$current_blog;
 
   if($value_field == "") {
     return false;
@@ -109,6 +109,9 @@ function  mfs3_save_image($field_meta_id,$name,$group_index,$field_index,$post_i
 
   //S3 Prefix
   $prefix = 'wp-content/files_mf/';
+  if(isset($current_blog)){
+    $prefix =  'wp-content/blogs.dir/'.$blog_id.'/files_mf/';
+  }
 
   //checking if the custom fields is a image
   $type = $wpdb->get_var("
@@ -126,7 +129,7 @@ function  mfs3_save_image($field_meta_id,$name,$group_index,$field_index,$post_i
       sf.name = '".$name."'"
   );
 
-  if( $type == $FIELD_TYPES['image'])  {
+  if( $type == $FIELD_TYPES['image'] || $type == $FIELD_TYPES['file'] || $type == $FIELD_TYPES['audio'])  {
     //Saving in the database a reference to this image
     $wpdb->query("INSERT INTO ".$mfs3_prefix."mfs3_images VALUES ('','".$s3_options['bucket']."','".$prefix.$value_field."')");
   }
