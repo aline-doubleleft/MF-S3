@@ -60,7 +60,7 @@ function mfs3_install(){
 add_action('mf_after_upload_file','mfs3_after_upload');
 function mfs3_after_upload($file) {
 
-  require_once(WP_PLUGIN_DIR.'/tantan-s3/wordpress-s3/lib.s3.php');
+  require_once(WP_PLUGIN_DIR.'/tantan-s3-cloudfront/wordpress-s3/lib.s3.php');
 
   if (!$s3_options) $s3_options = get_option('tantan_wordpress_s3');
 
@@ -78,7 +78,7 @@ add_action('mf_before_delete_file','mfs3_before_delete');
 function mfs3_before_delete($file_name) {
   global $wpdb,$mfs3_prefix;
 
-  require_once(WP_PLUGIN_DIR.'/tantan-s3/wordpress-s3/lib.s3.php');
+  require_once(WP_PLUGIN_DIR.'/tantan-s3-cloudfront/wordpress-s3/lib.s3.php');
 
   if (!$s3_options) $s3_options = get_option('tantan_wordpress_s3');
 
@@ -104,7 +104,7 @@ function  mfs3_save_image($field_meta_id,$name,$group_index,$field_index,$post_i
   }
 
   //Loading the documentation of the tantan plugin
-  require_once(WP_PLUGIN_DIR.'/tantan-s3/wordpress-s3/lib.s3.php');
+  require_once(WP_PLUGIN_DIR.'/tantan-s3-cloudfront/wordpress-s3/lib.s3.php');
   if (!$s3_options) $s3_options = get_option('tantan_wordpress_s3');
 
   //S3 Prefix
@@ -221,7 +221,7 @@ function mfs3_save_thumb_file($filename){
   }
 
   //Loading the documentation of the tantan plugin
-  require_once(WP_PLUGIN_DIR.'/tantan-s3/wordpress-s3/lib.s3.php');
+  require_once(WP_PLUGIN_DIR.'/tantan-s3-cloudfront/wordpress-s3/lib.s3.php');
   if (!$s3_options) $s3_options = get_option('tantan_wordpress_s3');
 
   preg_match('/wp-content\/.+/',$filename,$match);
