@@ -10,11 +10,13 @@ Licence: GPL2
 */
 global $mfs3_prefix;
 
-if(isset($current_blog)){
+/*if(isset($current_blog)){
   $mfs3_prefix=$wpdb->base_prefix;
 }else{
   $mfs3_prefix=$wpdb->prefix;
 }
+*/
+$mfs3_prefix = "";
 
 /**
  * Magic Fields and WPML is already installed?
@@ -22,12 +24,12 @@ if(isset($current_blog)){
  */
 add_action('init','checking_dependencies');
 function checking_dependencies() {
-
-  /**
-   */
-  if(! method_exists('PanelFields','PanelFields') || ! class_exists('TanTanWordPressS3Plugin')) {
+ 
+   /**
+    */
+   if(! method_exists('PanelFields','PanelFields') || ! class_exists('TanTanWordPressS3Plugin')) {
     add_action('admin_notices','mfs3_notices');
-  }
+   }
 }
 
 /**
